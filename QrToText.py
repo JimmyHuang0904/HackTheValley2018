@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import qrtools
-import pyautogui
 import time
 from firebase import firebase
 

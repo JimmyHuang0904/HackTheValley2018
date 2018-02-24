@@ -12,3 +12,9 @@ name = "pypi"
 [packages]
 
 opencv-python = "*"
+argparse = "*"
+"python3-xlib" = "*"
+python-xlib = "*"
+pyautogui = "*"
+qrtools = "*"
+python-firebase = "*"

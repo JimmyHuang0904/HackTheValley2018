@@ -1,19 +1,22 @@
-# --------------------------------------------------------
-# Camera sample code for Tegra X2/X1
-#
-# This program could capture and display video from
-# IP CAM, USB webcam, or the Tegra onboard camera.
-# Refer to the following blog post for how to set up
-# and run the code:
-#   https://jkjung-avt.github.io/tx2-camera-with-python/
-#
-# Written by JK Jung <jkjung13@gmail.com>
-# --------------------------------------------------------
-
 import cv2
 import numpy as np
+import qrtools
+import pyautogui
+import time
+from firebase import firebase
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(1) # /dev/video1 . If not then change accordingly
+qr = qrtools.QR()
+firebase = firebase.FirebaseApplication("https://htv2-3e7e6.firebaseio.com", None)
+
+assignedHID = "1"
+postFlag = False
+
+try:
+    assignedHIDLocation = firebase.get('/Locations', assignedHID)
+    print assignedHIDLocation
+except:
+    print("OH NO")
 
 while(True):
     # Capture frame-by-frame
@@ -24,9 +27,28 @@ while(True):
 
     # Display the resulting frame
     cv2.imshow('frame',gray)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
 
-# When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+    cv2.imwrite("screenshot.png", gray)
+
+    qr.decode("screenshot.png")
+    # print qr.data
+    if (qr.data != "NULL") & (postFlag == True):
+        uuid = qr.data
+        # print uuid
+        try:
+            result = firebase.get('/Users/' + uuid, 'assignedHID')
+            # print result
+            result = firebase.patch('/Users/' + uuid, {'assignedHID': assignedHID})
+
+        except:
+            print "Error"
+
+        postFlag = False
+        qr.data = "NULL"
+    else:
+        postFlag = True
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        cap.release()
+        cv2.destroyAllWindows()
+        break

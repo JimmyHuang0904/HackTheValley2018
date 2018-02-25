@@ -4,7 +4,7 @@ import qrtools
 import time
 from firebase import firebase
 
-cap = cv2.VideoCapture(1) # /dev/video1 . If not then change accordingly
+cap = cv2.VideoCapture(0) # /dev/video1 . If not then change accordingly
 qr = qrtools.QR()
 firebase = firebase.FirebaseApplication("https://htv2-3e7e6.firebaseio.com", None)
 

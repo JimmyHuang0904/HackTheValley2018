@@ -9,5 +9,5 @@ port=8883
 
 client1 = mqtt.Client("ClientName") # Doesnt matter
 client1.connect(broker,port)
-ret=client1.publish("tagger/rpi/bt",input)
+ret=client1.publish("tagger/rp2/bt",input) #rp1 for tag 1, rp2 for tag 2
 

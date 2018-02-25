@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import qrtools
-import pyautogui
 import time
 from firebase import firebase
 
@@ -9,14 +8,11 @@ cap = cv2.VideoCapture(1) # /dev/video1 . If not then change accordingly
 qr = qrtools.QR()
 firebase = firebase.FirebaseApplication("https://htv2-3e7e6.firebaseio.com", None)
 
-assignedHID = "1"
+# assignedHID = "1"
 postFlag = False
+previous = "NULL"
 
-try:
-    assignedHIDLocation = firebase.get('/Locations', assignedHID)
-    print assignedHIDLocation
-except:
-    print("OH NO")
+count = 0
 
 while(True):
     # Capture frame-by-frame
@@ -31,24 +27,31 @@ while(True):
     cv2.imwrite("screenshot.png", gray)
 
     qr.decode("screenshot.png")
-    # print qr.data
-    if (qr.data != "NULL") & (postFlag == True):
+    count = count + 1
+    if count >= 150:
+        count = 150
+
+    if (qr.data != "NULL") & (count >= 30) & (qr.data != previous):
+        count = 0
+
         uuid = qr.data
+        previous = uuid
         # print uuid
         try:
             result = firebase.get('/Users/' + uuid, 'assignedHID')
             # print result
-            result = firebase.patch('/Users/' + uuid, {'assignedHID': assignedHID})
+            result = firebase.patch('/Scanner/', {'assignedUID': uuid})
+            # result = firebase.patch('/Scanner/', {'scanned': True})
 
         except:
             print "Error"
 
-        postFlag = False
         qr.data = "NULL"
-    else:
-        postFlag = True
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         cap.release()
         cv2.destroyAllWindows()
         break
+
+cap.release()
+cv2.destroyAllWindows()

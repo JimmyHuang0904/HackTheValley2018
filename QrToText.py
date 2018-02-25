@@ -36,7 +36,7 @@ while(True):
         print uuid
         
         file = open("uuid.txt","w") 
-        file.write(uuid)
+        file.write(str(uuid))
         file.close()
 
         postFlag = False
@@ -48,3 +48,9 @@ while(True):
         cap.release()
         cv2.destroyAllWindows()
         break
+
+try:
+    cap.release()
+    cv2.destroyAllWindows()
+except:
+    print("Error")
